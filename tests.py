@@ -8,7 +8,7 @@ __status__ = "Production"
 __module_group__ = "Commandline Interface"
 
 
-def runAllTests() -> None:
+def run_all_tests() -> None:
     """Run all unit tests
     """
     print('All tests passed')

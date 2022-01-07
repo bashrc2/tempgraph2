@@ -10,27 +10,27 @@ __module_group__ = "Commandline Interface"
 # import os
 import sys
 import argparse
-from parseData import loadData
-from parseStations import loadStationLocations
-from parseStations import saveStationLocationsAsKML
-from tests import runAllTests
-from parseCountries import loadCountries
-from grid import getGrid
-from grid import saveGridAsKML
-from baseline import updateGridBaselines
-from anomaly import updateGridAnomalies
-from anomaly import getGlobalAnomalies
-from anomaly import plotGlobalAnomalies
+from parseData import load_data
+from parseStations import load_station_locations
+from parseStations import save_station_locations_as_kml
+from tests import run_all_tests
+from parseCountries import load_countries
+from grid import get_grid
+from grid import save_grid_as_kml
+from baseline import update_grid_baselines
+from anomaly import update_grid_anomalies
+from anomaly import get_global_anomalies
+from anomaly import plot_global_anomalies
 
 
-def str2bool(v) -> bool:
+def str2bool(value) -> bool:
     """Returns true if the given value is a boolean
     """
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+    if isinstance(value, bool):
+        return value
+    if value.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    if value.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
@@ -78,7 +78,7 @@ if args.debug:
     debug = True
 
 if args.tests:
-    runAllTests()
+    run_all_tests()
     sys.exit()
 
 if args.endYear <= args.startYear:
@@ -86,47 +86,47 @@ if args.endYear <= args.startYear:
     sys.exit()
 
 if __name__ == "__main__":
-    gridCells = getGrid(args.cellsHorizontal, args.cellsVertical)
-    print(str(len(gridCells)) + ' grid cells')
+    grid_cells = get_grid(args.cellsHorizontal, args.cellsVertical)
+    print(str(len(grid_cells)) + ' grid cells')
     print('Loading countries')
-    countries = loadCountries(args.countries)
+    countries = load_countries(args.countries)
     if not countries:
         print('No countries')
         sys.exit()
     print(str(len(countries.items())) + ' countries loaded')
     print('Loading station locations')
-    stationLocations = loadStationLocations(args.stations, gridCells)
-    if not stationLocations:
+    station_locations = load_station_locations(args.stations, grid_cells)
+    if not station_locations:
         print('No station locations')
         sys.exit()
-    print(str(len(stationLocations.items())) + ' station locations loaded')
+    print(str(len(station_locations.items())) + ' station locations loaded')
 
-    saveStationLocationsAsKML(stationLocations, 'stations.kml')
+    save_station_locations_as_kml(station_locations, 'stations.kml')
     print('Saved stations as KML')
 
-    saveGridAsKML(gridCells, 'grid.kml')
+    save_grid_as_kml(grid_cells, 'grid.kml')
     print('Saved grid as KML')
 
     print('Loading data from ' + args.filename)
-    stationsData, yearsData = \
-        loadData(args.filename, args.startYear, args.endYear)
-    if not stationsData:
+    stations_data, years_data = \
+        load_data(args.filename, args.startYear, args.endYear)
+    if not stations_data:
         print('No data')
         sys.exit()
-    print(str(len(stationsData.items())) + ' stations data loaded')
+    print(str(len(stations_data.items())) + ' stations data loaded')
     print('Calculating reference baseline between ' +
           str(args.baselineStart) + ' and ' + str(args.baselineEnd))
-    ctr = updateGridBaselines(gridCells, stationsData,
-                              args.baselineStart, args.baselineEnd)
+    ctr = update_grid_baselines(grid_cells, stations_data,
+                                args.baselineStart, args.baselineEnd)
     print(str(ctr) + ' grid baselines updated')
     print('Calculating grid anomalies between ' +
           str(args.startYear) + ' and ' + str(args.endYear))
-    percent = updateGridAnomalies(gridCells, stationsData,
-                                  args.startYear, args.endYear)
+    percent = update_grid_anomalies(grid_cells, stations_data,
+                                    args.startYear, args.endYear)
     print(str(percent) + '% grid anomalies updated')
     print('Calculating global anomalies between ' +
           str(args.startYear) + ' and ' + str(args.endYear))
-    globalAnom = getGlobalAnomalies(gridCells, args.startYear, args.endYear)
-    plotGlobalAnomalies(gridCells, args.startYear, args.endYear)
+    globalAnom = get_global_anomalies(grid_cells, args.startYear, args.endYear)
+    plot_global_anomalies(grid_cells, args.startYear, args.endYear)
     print('Done')
     sys.exit()

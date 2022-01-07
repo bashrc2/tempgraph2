@@ -8,13 +8,13 @@ __status__ = "Production"
 __module_group__ = "Commandline Interface"
 
 
-def loadCountries(filename: str) -> {}:
+def load_countries(filename: str) -> {}:
     """Loads countries from file
     """
     lines = []
     try:
-        with open(filename, 'r') as fp:
-            lines = fp.readlines()
+        with open(filename, 'r') as fp_countries:
+            lines = fp_countries.readlines()
     except BaseException:
         print('Unable to open ' + filename)
         return None

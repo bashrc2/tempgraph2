@@ -8,95 +8,96 @@ __status__ = "Production"
 __module_group__ = "Commandline Interface"
 
 
-def _getBaselineForYear(id: str, stationsData: {}, year: int) -> []:
+def _get_baseline_for_year(id: str, stations_data: {}, year: int) -> []:
     """Returns the baseline for a given station id
     """
     baseline = [None] * 12
-    if year not in stationsData[id]:
+    if year not in stations_data[id]:
         return baseline
-    monthData = stationsData[id][year]['month']
-    for monthIndex in range(12):
-        monthData2 = monthData[monthIndex]
-        if monthData2['qcflag'] == 'M':
+    month_data = stations_data[id][year]['month']
+    for month_index in range(12):
+        month_data2 = month_data[month_index]
+        if month_data2['qcflag'] == 'M':
             # Flagged as error
             continue
-        if monthData2['av'] > -80:
-            if monthData2['av'] < 80:
-                baseline[monthIndex] = monthData2['av']
+        if month_data2['av'] > -80:
+            if month_data2['av'] < 80:
+                baseline[month_index] = month_data2['av']
     return baseline
 
 
-def _getBaseline(id: str, stationsData: {},
-                 startYear: int, endYear: int) -> []:
+def _get_baseline(id: str, stations_data: {},
+                  start_year: int, end_year: int) -> []:
     """Returns the baseline for a given station id
     """
-    if id not in stationsData:
+    if id not in stations_data:
         return [None] * 12
 
-    if startYear == endYear:
-        return _getBaselineForYear(id, stationsData, startYear)
-    else:
-        baseline = [0.0] * 12
-        hits = [0] * 12
-        for year in range(startYear, endYear, 1):
-            if year not in stationsData[id]:
-                continue
-            monthData = stationsData[id][year]['month']
-            for monthIndex in range(12):
-                monthData2 = monthData[monthIndex]
-                if monthData2['qcflag'] == 'M':
-                    # Flagged as error
-                    continue
-                if monthData2['av'] > -80:
-                    if monthData2['av'] < 80:
-                        baseline[monthIndex] += monthData2['av']
-                        hits[monthIndex] += 1
+    if start_year == end_year:
+        return _get_baseline_for_year(id, stations_data, start_year)
 
-        for monthIndex in range(12):
-            if hits[monthIndex] > 0:
-                baseline[monthIndex] /= float(hits[monthIndex])
-            else:
-                baseline[monthIndex] = None
+    baseline = [0.0] * 12
+    hits = [0] * 12
+    for year in range(start_year, end_year, 1):
+        if year not in stations_data[id]:
+            continue
+        month_data = stations_data[id][year]['month']
+        for month_index in range(12):
+            month_data2 = month_data[month_index]
+            if month_data2['qcflag'] == 'M':
+                # Flagged as error
+                continue
+            if month_data2['av'] > -80:
+                if month_data2['av'] < 80:
+                    baseline[month_index] += month_data2['av']
+                    hits[month_index] += 1
+
+    for month_index in range(12):
+        if hits[month_index] > 0:
+            baseline[month_index] /= float(hits[month_index])
+        else:
+            baseline[month_index] = None
     return baseline
 
 
-def _baselineForStations(stationsData: {},
-                         startYear: int, endYear: int,
-                         stationIds: set) -> []:
+def _baseline_for_stations(stations_data: {},
+                           start_year: int, end_year: int,
+                           station_ids: set) -> []:
     """Returns a baseline for the given range of years
     and the given station ids
     """
-    if not stationIds:
+    if not station_ids:
         return [None] * 12, False
 
     baseline = [0.0] * 12
     hits = [0] * 12
-    for id in stationIds:
-        stationBaseline = _getBaseline(id, stationsData, startYear, endYear)
-        for monthIndex in range(12):
-            if stationBaseline[monthIndex] is not None:
-                baseline[monthIndex] += stationBaseline[monthIndex]
-                hits[monthIndex] += 1
+    for sid in station_ids:
+        station_baseline = \
+            _get_baseline(sid, stations_data, start_year, end_year)
+        for month_index in range(12):
+            if station_baseline[month_index] is not None:
+                baseline[month_index] += station_baseline[month_index]
+                hits[month_index] += 1
 
-    for monthIndex in range(12):
-        if hits[monthIndex] > 0:
-            baseline[monthIndex] /= float(hits[monthIndex])
+    for month_index in range(12):
+        if hits[month_index] > 0:
+            baseline[month_index] /= float(hits[month_index])
         else:
-            baseline[monthIndex] = None
+            baseline[month_index] = None
 
     return baseline, True
 
 
-def updateGridBaselines(grid: [], stationsData: {},
-                        startYear: int, endYear: int) -> int:
+def update_grid_baselines(grid: [], stations_data: {},
+                          start_year: int, end_year: int) -> int:
     """Calculates reference baselines for each grid cell
     """
     ctr = 0
-    for gridCell in grid:
-        if gridCell['stationIds']:
-            gridCell['baseline'], hasData = \
-                _baselineForStations(stationsData, startYear, endYear,
-                                     gridCell['stationIds'])
-            if hasData:
+    for grid_cell in grid:
+        if grid_cell['station_ids']:
+            grid_cell['baseline'], has_data = \
+                _baseline_for_stations(stations_data, start_year, end_year,
+                                       grid_cell['station_ids'])
+            if has_data:
                 ctr += 1
     return ctr
