@@ -21,6 +21,8 @@ from baseline import update_grid_baselines
 from anomaly import update_grid_anomalies
 from anomaly import get_global_anomalies
 from anomaly import plot_global_anomalies
+from anomaly import get_monthly_anomalies
+from anomaly import plot_monthly_anomalies
 
 
 def str2bool(value) -> bool:
@@ -64,6 +66,12 @@ parser.add_argument('--cellsHorizontal', dest='cellsHorizontal', type=int,
 parser.add_argument('--cellsVertical', dest='cellsVertical', type=int,
                     default=36,
                     help='Number of cells down the grid')
+parser.add_argument('--minLatitude', dest='minLatitude', type=float,
+                    default=0,
+                    help='Minimum latitude')
+parser.add_argument('--maxLatitude', dest='maxLatitude', type=float,
+                    default=90,
+                    help='Maximum latitude')
 parser.add_argument("--debug", type=str2bool, nargs='?',
                     const=True, default=False,
                     help="Show debug")
@@ -73,9 +81,9 @@ parser.add_argument("--tests", type=str2bool, nargs='?',
 
 args = parser.parse_args()
 
-debug = False
+DEBUG = False
 if args.debug:
-    debug = True
+    DEBUG = True
 
 if args.tests:
     run_all_tests()
@@ -107,26 +115,40 @@ if __name__ == "__main__":
     save_grid_as_kml(grid_cells, 'grid.kml')
     print('Saved grid as KML')
 
+    if args.minLatitude >= args.maxLatitude:
+        args.minLatitude = 0
+        args.maxLatitude = 90
+
     print('Loading data from ' + args.filename)
     stations_data, years_data = \
-        load_data(args.filename, args.startYear, args.endYear)
+        load_data(args.filename)
     if not stations_data:
         print('No data')
         sys.exit()
     print(str(len(stations_data.items())) + ' stations data loaded')
     print('Calculating reference baseline between ' +
           str(args.baselineStart) + ' and ' + str(args.baselineEnd))
-    ctr = update_grid_baselines(grid_cells, stations_data,
-                                args.baselineStart, args.baselineEnd)
-    print(str(ctr) + ' grid baselines updated')
+    CTR = update_grid_baselines(grid_cells, stations_data, station_locations,
+                                args.baselineStart, args.baselineEnd,
+                                args.minLatitude, args.maxLatitude)
+    print(str(CTR) + ' grid baselines updated')
     print('Calculating grid anomalies between ' +
           str(args.startYear) + ' and ' + str(args.endYear))
-    percent = update_grid_anomalies(grid_cells, stations_data,
-                                    args.startYear, args.endYear)
+    percent = update_grid_anomalies(grid_cells, stations_data, station_locations,
+                                    args.startYear, args.endYear,
+                                    args.minLatitude, args.maxLatitude)
     print(str(percent) + '% grid anomalies updated')
     print('Calculating global anomalies between ' +
           str(args.startYear) + ' and ' + str(args.endYear))
     globalAnom = get_global_anomalies(grid_cells, args.startYear, args.endYear)
-    plot_global_anomalies(grid_cells, args.startYear, args.endYear)
+    plot_global_anomalies(grid_cells, args.startYear, args.endYear,
+                          args.baselineStart, args.baselineEnd,
+                          args.minLatitude, args.maxLatitude)
+    print('Calculating monthly anomalies between ' +
+          str(args.startYear) + ' and ' + str(args.endYear))
+    monthlyAnom = get_monthly_anomalies(grid_cells, args.startYear, args.endYear)
+    plot_monthly_anomalies(grid_cells, args.endYear-100, args.endYear,
+                           args.baselineStart, args.baselineEnd,
+                           args.minLatitude, args.maxLatitude)
     print('Done')
     sys.exit()

@@ -15,9 +15,9 @@ def load_station_locations(filename: str, grid: []) -> {}:
     """
     lines = []
     try:
-        with open(filename, 'r') as fp_loc:
+        with open(filename, 'r', encoding='utf-8') as fp_loc:
             lines = fp_loc.readlines()
-    except BaseException:
+    except OSError:
         print('Unable to open ' + filename)
         return None
     station_locations = {}

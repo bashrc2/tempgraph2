@@ -8,14 +8,14 @@ __status__ = "Production"
 __module_group__ = "Commandline Interface"
 
 
-def load_data(filename: str, start_year: int, end_year: int) -> ({}, {}):
+def load_data(filename: str) -> ({}, {}):
     """Loads data from file
     """
     lines = []
     try:
-        with open(filename, 'r') as fp_load:
+        with open(filename, 'r', encoding='utf-8') as fp_load:
             lines = fp_load.readlines()
-    except BaseException:
+    except OSError:
         print('Unable to open ' + filename)
         return None, None
     years = {}

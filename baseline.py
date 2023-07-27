@@ -60,9 +60,10 @@ def _get_baseline(id: str, stations_data: {},
     return baseline
 
 
-def _baseline_for_stations(stations_data: {},
+def _baseline_for_stations(stations_data: {}, station_locations: {},
                            start_year: int, end_year: int,
-                           station_ids: set) -> []:
+                           station_ids: set,
+                           min_latitude: float, max_latitude: float) -> []:
     """Returns a baseline for the given range of years
     and the given station ids
     """
@@ -72,6 +73,9 @@ def _baseline_for_stations(stations_data: {},
     baseline = [0.0] * 12
     hits = [0] * 12
     for sid in station_ids:
+        if station_locations[sid]['latitude'] < min_latitude or \
+           station_locations[sid]['latitude'] > max_latitude:
+            continue
         station_baseline = \
             _get_baseline(sid, stations_data, start_year, end_year)
         for month_index in range(12):
@@ -88,16 +92,19 @@ def _baseline_for_stations(stations_data: {},
     return baseline, True
 
 
-def update_grid_baselines(grid: [], stations_data: {},
-                          start_year: int, end_year: int) -> int:
+def update_grid_baselines(grid: [], stations_data: {}, station_locations: {},
+                          start_year: int, end_year: int,
+                          min_latitude: float, max_latitude: float) -> int:
     """Calculates reference baselines for each grid cell
     """
     ctr = 0
     for grid_cell in grid:
         if grid_cell['station_ids']:
             grid_cell['baseline'], has_data = \
-                _baseline_for_stations(stations_data, start_year, end_year,
-                                       grid_cell['station_ids'])
+                _baseline_for_stations(stations_data, station_locations,
+                                       start_year, end_year,
+                                       grid_cell['station_ids'],
+                                       min_latitude, max_latitude)
             if has_data:
                 ctr += 1
     return ctr
