@@ -110,5 +110,5 @@ def save_grid_as_kml(grid: [], filename: str) -> None:
     kml_str += \
         "</Document>\n" + \
         "</kml>\n"
-    with open(filename, 'w+') as fp_kml:
+    with open(filename, 'w+', encoding='utf-8') as fp_kml:
         fp_kml.write(kml_str)

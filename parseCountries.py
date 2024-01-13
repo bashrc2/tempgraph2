@@ -13,9 +13,9 @@ def load_countries(filename: str) -> {}:
     """
     lines = []
     try:
-        with open(filename, 'r') as fp_countries:
+        with open(filename, 'r', encoding='utf-8') as fp_countries:
             lines = fp_countries.readlines()
-    except BaseException:
+    except OSError:
         print('Unable to open ' + filename)
         return None
     countries = {}

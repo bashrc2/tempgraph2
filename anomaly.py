@@ -258,6 +258,9 @@ def plot_monthly_anomalies(grid: [],
         "set rmargin 2\n" + \
         "set xlabel \"" + x_label + "\"\n" + \
         "set ylabel \"" + y_label + "\"\n" + \
+        "set xtics (\"Jan\" 1, \"Feb\" 2, \"Mar\" 3, \"Apr\" 4, " + \
+        "\"May\" 5, \"Jun\" 6, \"Jul\" 7, \"Aug\" 8, \"Sep\" 9, " + \
+        "\"Oct\" 10, \"Nov\" 11, \"Dec\" 12)\n" + \
         "set grid\n" + \
         "set key right bottom\n" + \
         "set terminal " + image_format2 + \

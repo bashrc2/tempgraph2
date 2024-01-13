@@ -52,7 +52,7 @@ parser.add_argument('--start', '--startYear', dest='startYear', type=int,
                     default=1900,
                     help='Start year')
 parser.add_argument('--end', '--endYear', dest='endYear', type=int,
-                    default=2022,
+                    default=2023,
                     help='End year')
 parser.add_argument('--baselineStart', dest='baselineStart', type=int,
                     default=1961,
