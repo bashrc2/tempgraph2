@@ -109,8 +109,8 @@ def get_monthly_anomalies(grid: [],
     """
     result = {}
     for year in range(start_year, end_year + 1, 1):
-        months_anomaly = [0,0,0,0,0,0,0,0,0,0,0,0]
-        months_ctr = [0,0,0,0,0,0,0,0,0,0,0,0]
+        months_anomaly = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        months_ctr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ctr = 0
         for grid_cell in grid:
             if grid_cell['anomalies_monthly'].get(year):
@@ -143,10 +143,14 @@ def plot_global_anomalies(grid: [],
     """Plot yearly anomalies graph
     """
     anomalies = get_global_anomalies(grid, start_year, end_year)
+    if not anomalies:
+        print('No anomalies')
     series = []
     minimum_temp = 99999999
     maximum_temp = -99999999
     for year in range(start_year, end_year + 1, 1):
+        if not anomalies.get(year):
+            continue
         series.append(anomalies[year])
         if anomalies[year] > maximum_temp:
             maximum_temp = anomalies[year]
@@ -210,6 +214,8 @@ def plot_monthly_anomalies(grid: [],
     minimum_temp = 99999999
     maximum_temp = -99999999
     for year in range(start_year, end_year + 1, 1):
+        if not anomalies.get(year):
+            continue
         series.append(anomalies[year])
         for month_index in range(12):
             if anomalies[year][month_index] is None:

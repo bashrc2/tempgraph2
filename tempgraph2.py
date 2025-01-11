@@ -34,8 +34,7 @@ def str2bool(value) -> bool:
         return True
     if value.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+    raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 parser = argparse.ArgumentParser(description='tempgraph2')
@@ -52,7 +51,7 @@ parser.add_argument('--start', '--startYear', dest='startYear', type=int,
                     default=1900,
                     help='Start year')
 parser.add_argument('--end', '--endYear', dest='endYear', type=int,
-                    default=2023,
+                    default=2025,
                     help='End year')
 parser.add_argument('--baselineStart', dest='baselineStart', type=int,
                     default=1961,
